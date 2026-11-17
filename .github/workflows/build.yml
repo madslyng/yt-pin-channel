@@ -30,7 +30,7 @@ jobs:
         run: npx --yes web-ext@10 lint --source-dir . --self-hosted=false
 
       - name: Build
-        run: npx --yes web-ext@10 build --source-dir . --artifacts-dir dist --filename "yt-pin-channel-{version}.zip"
+        run: npx --yes web-ext@10 build --source-dir . --artifacts-dir dist --filename "yt-pin-channel-{version}.zip" --ignore-files amo-metadata.json
 
       - name: Create GitHub release
         env:
