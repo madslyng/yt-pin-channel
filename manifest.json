@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Pinned Channels",
+  "version": "1.0.0",
+  "description": "Pin your favourite YouTube channels to a thin bar at the top of YouTube.",
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.youtube.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "yt-pin-channel@example.com",
+      "strict_min_version": "115.0"
+    }
+  }
+}
