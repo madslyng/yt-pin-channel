@@ -27,8 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          sparse-checkout: amo-metadata.json
-          sparse-checkout-cone-mode: false
+          sparse-checkout: amo
 
       - uses: actions/setup-node@v7
         with:
@@ -47,4 +46,23 @@ jobs:
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-        run: npx --yes web-ext@10 sign --source-dir ext --channel listed --amo-metadata amo-metadata.json
+        run: npx --yes web-ext@10 sign --source-dir ext --channel listed --amo-metadata amo/metadata.json
+
+      - name: Upload listing icon
+        env:
+          AMO_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          guid=$(jq -r .browser_specific_settings.gecko.id ext/manifest.json)
+          token=$(node -e '
+            const c = require("crypto");
+            const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+            const now = Math.floor(Date.now() / 1000);
+            const data = b64({ alg: "HS256", typ: "JWT" }) + "." +
+              b64({ iss: process.env.AMO_KEY, jti: c.randomUUID(), iat: now, exp: now + 60 });
+            console.log(data + "." + c.createHmac("sha256", process.env.AMO_SECRET).update(data).digest("base64url"));
+          ')
+          curl -fsS -o /dev/null -X PATCH \
+            -H "Authorization: JWT $token" \
+            -F "icon=@amo/icon.png" \
+            "https://addons.mozilla.org/api/v5/addons/addon/$guid/"

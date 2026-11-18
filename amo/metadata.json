@@ -1,0 +1,15 @@
+{
+  "name": { "en-US": "YouTube Pinned Channels" },
+  "summary": { "en-US": "Pin your favourite YouTube channels to a thin bar at the top of YouTube." },
+  "description": {
+    "en-US": "Keep the channels you watch most one click away.\n\n<b>Features</b>\n<ul><li>Pin a channel from its channel page, a video or a Short with the <i>Pin</i> button</li><li>Drag pins to reorder them</li><li>Hover a pin and click × to unpin</li><li>Pins sync across your devices with Firefox Sync</li></ul>\n\nNo data is collected. The extension only talks to YouTube itself."
+  },
+  "homepage": { "en-US": "https://github.com/madslyng/yt-pin-channel" },
+  "support_url": { "en-US": "https://github.com/madslyng/yt-pin-channel/issues" },
+  "categories": {
+    "firefox": ["photos-music-videos"]
+  },
+  "version": {
+    "license": "MIT"
+  }
+}
