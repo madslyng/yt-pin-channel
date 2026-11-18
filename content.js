@@ -226,33 +226,67 @@
     }
   };
 
+  // YouTube can keep stale or hidden copies of the masthead around; use the rendered one.
+  const findContainer = () =>
+    [...document.querySelectorAll("#masthead-container")].find((c) => c.getClientRects().length > 0) ||
+    null;
+
   const mount = () => {
-    const container = document.querySelector("#masthead-container");
+    const container = findContainer();
     if (!container) return false;
-    if (!bar || !bar.isConnected) {
+    if (!bar) {
       bar = el("div");
       bar.id = "ytpin-bar";
-      container.append(bar);
     }
-    document.documentElement.classList.add("ytpin-active");
-    render();
+    if (bar.parentElement !== container) {
+      container.append(bar);
+      render();
+    }
     return true;
+  };
+
+  const intentionallyHidden = () => {
+    const app = document.querySelector("ytd-app");
+    return !!app && (app.hasAttribute("fullscreen") || app.hasAttribute("masthead-hidden"));
+  };
+
+  const barVisible = () =>
+    !!bar?.isConnected && bar.parentElement === findContainer() && bar.offsetHeight > 0;
+
+  // Re-mount whenever YouTube re-renders the masthead, and only reserve space while the bar shows.
+  const ensureMounted = () => {
+    if (document.hidden || intentionallyHidden()) return;
+    if (!barVisible()) mount();
+    document.documentElement.classList.toggle("ytpin-active", barVisible());
+  };
+
+  let checkPending = false;
+  const scheduleCheck = () => {
+    if (checkPending) return;
+    checkPending = true;
+    setTimeout(() => {
+      checkPending = false;
+      ensureMounted();
+    }, 250);
   };
 
   const init = async () => {
     await migrateLocalPins();
     await loadPins();
 
-    if (!mount()) {
-      const observer = new MutationObserver(() => {
-        if (mount()) observer.disconnect();
-      });
-      observer.observe(document.documentElement, { childList: true, subtree: true });
-    }
+    ensureMounted();
+    new MutationObserver(scheduleCheck).observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["hidden", "style", "class", "fullscreen", "masthead-hidden"],
+    });
+    document.addEventListener("visibilitychange", scheduleCheck);
 
     // YouTube is a SPA; re-evaluate the "Pin" button after each navigation.
     document.addEventListener("yt-navigate-finish", () => {
-      mount();
+      ensureMounted();
+      render();
       // The owner link on watch pages may render slightly after navigation.
       setTimeout(render, 1500);
     });

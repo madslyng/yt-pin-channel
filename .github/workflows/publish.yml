@@ -41,13 +41,16 @@ jobs:
           TAG="${TAG#publish/}"
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "*.zip" --dir dist
           unzip -q dist/*.zip -d ext
+          notes=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body -q .body)
+          jq --arg notes "$notes" 'if $notes == "" then . else .version.release_notes = {"en-US": $notes} end' \
+            amo/metadata.json > metadata.json
 
       - name: Submit to addons.mozilla.org
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         # Listed versions go through Mozilla review; don't wait for approval.
-        run: npx --yes web-ext@10 sign --source-dir ext --channel listed --amo-metadata amo/metadata.json --approval-timeout 0
+        run: npx --yes web-ext@10 sign --source-dir ext --channel listed --amo-metadata metadata.json --approval-timeout 0
 
       - name: Upload listing icon
         env:
