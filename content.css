@@ -131,9 +131,19 @@ html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) tp-yt-app-hea
   margin-top: calc(var(--ytpin-masthead-height, var(--ytd-masthead-height, 56px)) + var(--ytpin-height)) !important;
 }
 
-html.ytpin-active tp-yt-app-drawer#guide #contentContainer,
+/* The mini guide (collapsed left rail) is anchored below the masthead; push it below the bar. */
 html.ytpin-active ytd-mini-guide-renderer {
   margin-top: var(--ytpin-height) !important;
+}
+
+/* The persistent guide drawer is a fixed panel anchored below the masthead and
+   stacked above it, so it would cover (and steal hovers from) the left end of
+   the bar. Push it down and shorten it so it still ends at the viewport bottom.
+   The modal drawer (narrow windows) needs no help: YouTube measures the masthead
+   container - which includes the bar - and positions it correctly itself. */
+html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) tp-yt-app-drawer#guide[persistent] {
+  margin-top: var(--ytpin-height) !important;
+  height: calc(100% - var(--ytpin-masthead-height, 56px) - var(--ytpin-height)) !important;
 }
 
 html.ytpin-active ytd-app[masthead-hidden] #ytpin-bar,
