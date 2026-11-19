@@ -126,6 +126,51 @@
     return node;
   };
 
+  // Modal confirmation before unpinning; resolves to true when the user confirms.
+  const confirmUnpin = (pin) =>
+    new Promise((resolve) => {
+      const dialog = el("dialog", "ytpin-dialog");
+
+      const avatar = el("img", "ytpin-dialog-avatar");
+      avatar.alt = "";
+      avatar.referrerPolicy = "no-referrer";
+      if (pin.avatar) avatar.src = pin.avatar;
+
+      const header = el("div", "ytpin-dialog-header");
+      header.append(avatar, el("h2", "ytpin-dialog-title", `Unpin ${pin.name}?`));
+
+      const cancel = el("button", "ytpin-dialog-button", "Cancel");
+      const confirm = el("button", "ytpin-dialog-button ytpin-dialog-confirm", "Unpin");
+      const actions = el("div", "ytpin-dialog-actions");
+      actions.append(cancel, confirm);
+
+      dialog.append(
+        header,
+        el("p", "ytpin-dialog-text", "The channel will be removed from your pinned bar."),
+        actions
+      );
+
+      const finish = (ok) => {
+        dialog.close();
+        dialog.remove();
+        resolve(ok);
+      };
+      cancel.addEventListener("click", () => finish(false));
+      confirm.addEventListener("click", () => finish(true));
+      // Esc key fires "cancel"; a click on the backdrop targets the dialog itself.
+      dialog.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        finish(false);
+      });
+      dialog.addEventListener("click", (e) => {
+        if (e.target === dialog) finish(false);
+      });
+
+      (document.body || document.documentElement).append(dialog);
+      dialog.showModal();
+      cancel.focus();
+    });
+
   const DRAG_TYPE = "application/x-ytpin-index";
   let dragIndex = null;
 
@@ -215,7 +260,9 @@
       remove.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        unpin(pin.id);
+        confirmUnpin(pin).then((ok) => {
+          if (ok) unpin(pin.id);
+        });
       });
 
       item.append(img, el("span", "ytpin-name", pin.name), remove);

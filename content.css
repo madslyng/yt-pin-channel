@@ -140,3 +140,79 @@ html.ytpin-active ytd-app[masthead-hidden] #ytpin-bar,
 html.ytpin-active ytd-app[fullscreen] #ytpin-bar {
   display: none;
 }
+
+/* Unpin confirmation dialog. */
+dialog.ytpin-dialog {
+  width: min(340px, calc(100vw - 32px));
+  padding: 20px 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--yt-spec-raised-background, #fff);
+  color: var(--yt-spec-text-primary, #0f0f0f);
+  font-family: "Roboto", "Arial", sans-serif;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.35);
+}
+
+dialog.ytpin-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ytpin-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ytpin-dialog-avatar {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--yt-spec-10-percent-layer, #ddd);
+}
+
+.ytpin-dialog-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+
+.ytpin-dialog-text {
+  margin: 12px 0 20px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--yt-spec-text-secondary, #606060);
+}
+
+.ytpin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ytpin-dialog-button {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 18px;
+  font: 500 14px "Roboto", "Arial", sans-serif;
+  background: var(--yt-spec-badge-chip-background, rgba(0, 0, 0, 0.05));
+  color: var(--yt-spec-text-primary, #0f0f0f);
+  cursor: pointer;
+}
+
+.ytpin-dialog-button:hover {
+  background: var(--yt-spec-button-chip-background-hover, rgba(0, 0, 0, 0.1));
+}
+
+.ytpin-dialog-button.ytpin-dialog-confirm {
+  background: var(--yt-spec-call-to-action, #065fd4);
+  color: var(--yt-spec-static-overlay-text-primary, #fff);
+}
+
+.ytpin-dialog-button.ytpin-dialog-confirm:hover {
+  opacity: 0.9;
+}
