@@ -193,6 +193,15 @@
     if (!needsConfirm || (await confirmCommand(command))) await command.run();
   };
 
+  // Remember how often each pin is used so they can optionally be sorted by it.
+  const countClick = async (id) => {
+    await loadPins();
+    const pin = pins.find((p) => p.id === id);
+    if (!pin) return;
+    pin.clicks = (pin.clicks || 0) + 1;
+    await savePins();
+  };
+
   const DRAG_TYPE = "application/x-ytpin-index";
   let dragIndex = null;
 
@@ -263,12 +272,22 @@
     add.addEventListener("click", () => pinCurrent(add));
     bar.append(add);
 
-    pins.forEach((pin, index) => {
+    // With click sorting on, display order is derived from click counts (stable
+    // sort, so ties keep the stored manual order) and manual reordering is off.
+    const displayPins = settings.sortByClicks
+      ? [...pins].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+      : pins;
+
+    displayPins.forEach((pin, index) => {
       const item = el("a", "ytpin-item");
       item.href = pin.url.startsWith(ORIGIN + "/") ? pin.url + settings.linkTarget : ORIGIN;
       item.title = pin.name;
-      item.draggable = true;
-      addDragHandlers(item, index);
+      item.draggable = !settings.sortByClicks;
+      if (!settings.sortByClicks) addDragHandlers(item, index);
+      item.addEventListener("click", () => countClick(pin.id));
+      item.addEventListener("auxclick", (e) => {
+        if (e.button === 1) countClick(pin.id); // middle click opens a tab too
+      });
 
       const img = el("img", "ytpin-avatar");
       img.alt = "";

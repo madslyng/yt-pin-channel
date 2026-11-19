@@ -13,6 +13,7 @@ const YTPIN_DEFAULT_SETTINGS = {
   linkTarget: "",
   confirmPin: true,
   confirmUnpin: true,
+  sortByClicks: false,
 };
 
 const ytpinNormalizeSettings = (raw) => {
@@ -20,7 +21,7 @@ const ytpinNormalizeSettings = (raw) => {
   if (!YTPIN_LINK_TARGETS.some((t) => t.value === settings.linkTarget)) {
     settings.linkTarget = YTPIN_DEFAULT_SETTINGS.linkTarget;
   }
-  for (const key of ["confirmPin", "confirmUnpin"]) {
+  for (const key of ["confirmPin", "confirmUnpin", "sortByClicks"]) {
     if (typeof settings[key] !== "boolean") settings[key] = YTPIN_DEFAULT_SETTINGS[key];
   }
   return settings;
