@@ -11,12 +11,17 @@ const YTPIN_LINK_TARGETS = [
 
 const YTPIN_DEFAULT_SETTINGS = {
   linkTarget: "",
+  confirmPin: true,
+  confirmUnpin: true,
 };
 
 const ytpinNormalizeSettings = (raw) => {
   const settings = { ...YTPIN_DEFAULT_SETTINGS, ...(raw || {}) };
   if (!YTPIN_LINK_TARGETS.some((t) => t.value === settings.linkTarget)) {
     settings.linkTarget = YTPIN_DEFAULT_SETTINGS.linkTarget;
+  }
+  for (const key of ["confirmPin", "confirmUnpin"]) {
+    if (typeof settings[key] !== "boolean") settings[key] = YTPIN_DEFAULT_SETTINGS[key];
   }
   return settings;
 };

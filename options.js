@@ -16,4 +16,15 @@
     settings.linkTarget = select.value;
     ytpinSaveSettings(settings);
   });
+
+  const bindCheckbox = (id, key) => {
+    const box = document.getElementById(id);
+    box.checked = settings[key];
+    box.addEventListener("change", () => {
+      settings[key] = box.checked;
+      ytpinSaveSettings(settings);
+    });
+  };
+  bindCheckbox("confirm-pin", "confirmPin");
+  bindCheckbox("confirm-unpin", "confirmUnpin");
 })();

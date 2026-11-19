@@ -7,6 +7,17 @@
         font: 13px system-ui, sans-serif;
         margin: 12px;
       }
+      section {
+        margin-bottom: 16px;
+      }
+      h2 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #666;
+      }
       .ytpin-option {
         display: flex;
         align-items: center;
@@ -14,19 +25,34 @@
         margin-bottom: 8px;
       }
       .ytpin-hint {
+        margin: 4px 0 0;
         color: #666;
         font-size: 12px;
       }
     </style>
   </head>
   <body>
-    <div class="ytpin-option">
-      <label for="link-target">Pinned channels link to</label>
-      <select id="link-target"></select>
-    </div>
-    <p class="ytpin-hint">
-      Choose which page of a channel opens when you click a pin in the bar.
-    </p>
+    <section>
+      <h2>Links</h2>
+      <div class="ytpin-option">
+        <label for="link-target">Pinned channels link to</label>
+        <select id="link-target"></select>
+      </div>
+      <p class="ytpin-hint">
+        Choose which page of a channel opens when you click a pin in the bar.
+      </p>
+    </section>
+    <section>
+      <h2>Confirmation</h2>
+      <label class="ytpin-option">
+        <input type="checkbox" id="confirm-pin" />
+        Ask for confirmation before pinning a channel
+      </label>
+      <label class="ytpin-option">
+        <input type="checkbox" id="confirm-unpin" />
+        Ask for confirmation before unpinning a channel
+      </label>
+    </section>
     <script src="common.js"></script>
     <script src="options.js"></script>
   </body>

@@ -101,22 +101,12 @@
         console.warn("[ytpin] Fetch failed, using page data instead:", err);
         info = scrapeChannelInfo(path);
       }
-      await loadPins();
-      if (!pins.some((p) => p.id === info.id)) {
-        pins.push(info);
-        await savePins();
-      }
+      await runCommand(pinCommand(info));
     } catch (err) {
       console.error("[ytpin] Failed to pin channel:", err);
     } finally {
       render();
     }
-  };
-
-  const unpin = async (id) => {
-    await loadPins();
-    pins = pins.filter((p) => p.id !== id);
-    await savePins();
   };
 
   const el = (tag, cls, text) => {
@@ -126,29 +116,55 @@
     return node;
   };
 
-  // Modal confirmation before unpinning; resolves to true when the user confirms.
-  const confirmUnpin = (pin) =>
+  // Commands bundle the confirmation copy shown to the user with the action to
+  // perform, so every pin mutation goes through the same confirm-then-run flow.
+  const pinCommand = (info) => ({
+    confirmSetting: "confirmPin",
+    avatar: info.avatar,
+    title: `Pin ${info.name}?`,
+    text: "The channel will be added to your pinned bar.",
+    confirmLabel: "Pin",
+    run: async () => {
+      await loadPins();
+      if (!pins.some((p) => p.id === info.id)) {
+        pins.unshift(info); // new pins go to the front of the bar
+        await savePins();
+      }
+    },
+  });
+
+  const unpinCommand = (pin) => ({
+    confirmSetting: "confirmUnpin",
+    avatar: pin.avatar,
+    title: `Unpin ${pin.name}?`,
+    text: "The channel will be removed from your pinned bar.",
+    confirmLabel: "Unpin",
+    run: async () => {
+      await loadPins();
+      pins = pins.filter((p) => p.id !== pin.id);
+      await savePins();
+    },
+  });
+
+  // Modal confirmation for a command; resolves to true when the user confirms.
+  const confirmCommand = (command) =>
     new Promise((resolve) => {
       const dialog = el("dialog", "ytpin-dialog");
 
       const avatar = el("img", "ytpin-dialog-avatar");
       avatar.alt = "";
       avatar.referrerPolicy = "no-referrer";
-      if (pin.avatar) avatar.src = pin.avatar;
+      if (command.avatar) avatar.src = command.avatar;
 
       const header = el("div", "ytpin-dialog-header");
-      header.append(avatar, el("h2", "ytpin-dialog-title", `Unpin ${pin.name}?`));
+      header.append(avatar, el("h2", "ytpin-dialog-title", command.title));
 
       const cancel = el("button", "ytpin-dialog-button", "Cancel");
-      const confirm = el("button", "ytpin-dialog-button ytpin-dialog-confirm", "Unpin");
+      const confirm = el("button", "ytpin-dialog-button ytpin-dialog-confirm", command.confirmLabel);
       const actions = el("div", "ytpin-dialog-actions");
       actions.append(cancel, confirm);
 
-      dialog.append(
-        header,
-        el("p", "ytpin-dialog-text", "The channel will be removed from your pinned bar."),
-        actions
-      );
+      dialog.append(header, el("p", "ytpin-dialog-text", command.text), actions);
 
       const finish = (ok) => {
         dialog.close();
@@ -170,6 +186,12 @@
       dialog.showModal();
       cancel.focus();
     });
+
+  const runCommand = async (command) => {
+    // Each command's confirmation can be turned off individually in the options.
+    const needsConfirm = settings[command.confirmSetting] !== false;
+    if (!needsConfirm || (await confirmCommand(command))) await command.run();
+  };
 
   const DRAG_TYPE = "application/x-ytpin-index";
   let dragIndex = null;
@@ -260,9 +282,7 @@
       remove.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        confirmUnpin(pin).then((ok) => {
-          if (ok) unpin(pin.id);
-        });
+        runCommand(unpinCommand(pin));
       });
 
       item.append(img, el("span", "ytpin-name", pin.name), remove);
