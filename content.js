@@ -253,10 +253,17 @@
   const barVisible = () =>
     !!bar?.isConnected && bar.parentElement === findContainer() && bar.offsetHeight > 0;
 
+  // Expose the real masthead height; it varies with zoom and layout, so don't assume 56px.
+  const syncMastheadHeight = () => {
+    const height = bar?.parentElement?.querySelector(":scope > #masthead")?.offsetHeight;
+    if (height) document.documentElement.style.setProperty("--ytpin-masthead-height", `${height}px`);
+  };
+
   // Re-mount whenever YouTube re-renders the masthead, and only reserve space while the bar shows.
   const ensureMounted = () => {
     if (document.hidden || intentionallyHidden()) return;
     if (!barVisible()) mount();
+    syncMastheadHeight();
     document.documentElement.classList.toggle("ytpin-active", barVisible());
   };
 
@@ -282,6 +289,7 @@
       attributeFilter: ["hidden", "style", "class", "fullscreen", "masthead-hidden"],
     });
     document.addEventListener("visibilitychange", scheduleCheck);
+    window.addEventListener("resize", scheduleCheck);
 
     // YouTube is a SPA; re-evaluate the "Pin" button after each navigation.
     document.addEventListener("yt-navigate-finish", () => {

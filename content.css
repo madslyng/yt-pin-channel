@@ -119,9 +119,16 @@
   padding-left: 8px;
 }
 
-/* Push page content and side guide down to make room for the bar. */
+/* Push page content and side guide down to make room for the bar.
+   --ytpin-masthead-height is measured at runtime by content.js. */
 html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) ytd-page-manager#page-manager {
-  margin-top: calc(var(--ytd-masthead-height, 56px) + var(--ytpin-height)) !important;
+  margin-top: calc(var(--ytpin-masthead-height, var(--ytd-masthead-height, 56px)) + var(--ytpin-height)) !important;
+}
+
+/* The channel page header (banner, avatar, tabs) is a fixed element anchored
+   just below the masthead; push it below the bar as well. */
+html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) tp-yt-app-header {
+  margin-top: calc(var(--ytpin-masthead-height, var(--ytd-masthead-height, 56px)) + var(--ytpin-height)) !important;
 }
 
 html.ytpin-active tp-yt-app-drawer#guide #contentContainer,

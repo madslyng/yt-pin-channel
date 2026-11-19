@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Pinned Channels",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Pin your favourite YouTube channels to a thin bar at the top of YouTube.",
   "icons": {
     "48": "icons/icon.svg",
