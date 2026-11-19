@@ -6,6 +6,7 @@
   const CHANNEL_PATH_RE = /^\/(@[^/]+|channel\/UC[\w-]+|c\/[^/]+|user\/[^/]+)/;
 
   let pins = [];
+  let settings = { ...YTPIN_DEFAULT_SETTINGS };
   let bar = null;
 
   const loadPins = async () => {
@@ -197,7 +198,7 @@
 
     pins.forEach((pin, index) => {
       const item = el("a", "ytpin-item");
-      item.href = pin.url.startsWith(ORIGIN + "/") ? pin.url : ORIGIN;
+      item.href = pin.url.startsWith(ORIGIN + "/") ? pin.url + settings.linkTarget : ORIGIN;
       item.title = pin.name;
       item.draggable = true;
       addDragHandlers(item, index);
@@ -234,6 +235,11 @@
   const mount = () => {
     const container = findContainer();
     if (!container) return false;
+    // Drop bars orphaned by a previous script instance (e.g. after an extension reload,
+    // the old sandbox dies but the DOM it injected stays behind).
+    for (const stale of document.querySelectorAll("#ytpin-bar")) {
+      if (stale !== bar) stale.remove();
+    }
     if (!bar) {
       bar = el("div");
       bar.id = "ytpin-bar";
@@ -280,6 +286,7 @@
   const init = async () => {
     await migrateLocalPins();
     await loadPins();
+    settings = await ytpinLoadSettings();
 
     ensureMounted();
     new MutationObserver(scheduleCheck).observe(document.documentElement, {
@@ -300,10 +307,10 @@
     });
 
     browser.storage.onChanged.addListener((changes, area) => {
-      if (area === "sync" && changes[STORAGE_KEY]) {
-        pins = changes[STORAGE_KEY].newValue || [];
-        render();
-      }
+      if (area !== "sync") return;
+      if (changes[STORAGE_KEY]) pins = changes[STORAGE_KEY].newValue || [];
+      if (changes[YTPIN_SETTINGS_KEY]) settings = ytpinNormalizeSettings(changes[YTPIN_SETTINGS_KEY].newValue);
+      if (changes[STORAGE_KEY] || changes[YTPIN_SETTINGS_KEY]) render();
     });
   };
 

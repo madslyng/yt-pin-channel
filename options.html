@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font: 13px system-ui, sans-serif;
+        margin: 12px;
+      }
+      .ytpin-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .ytpin-hint {
+        color: #666;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ytpin-option">
+      <label for="link-target">Pinned channels link to</label>
+      <select id="link-target"></select>
+    </div>
+    <p class="ytpin-hint">
+      Choose which page of a channel opens when you click a pin in the bar.
+    </p>
+    <script src="common.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
