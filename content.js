@@ -258,6 +258,7 @@
   const render = () => {
     if (!bar) return;
     bar.replaceChildren();
+    bar.classList.toggle("ytpin-centered", settings.centerPins);
 
     const path = currentChannelPath();
     const alreadyPinned = path && pins.some((p) => p.url === ORIGIN + path);

@@ -28,4 +28,5 @@
   bindCheckbox("confirm-pin", "confirmPin");
   bindCheckbox("confirm-unpin", "confirmUnpin");
   bindCheckbox("sort-by-clicks", "sortByClicks");
+  bindCheckbox("center-pins", "centerPins");
 })();

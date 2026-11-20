@@ -119,6 +119,16 @@
   padding-left: 8px;
 }
 
+/* Center the pin group via auto margins: unlike justify-content, these collapse
+   to zero when the bar overflows, keeping every pin scrollable and reachable. */
+#ytpin-bar.ytpin-centered > :first-child {
+  margin-left: auto;
+}
+
+#ytpin-bar.ytpin-centered > :last-child {
+  margin-right: auto;
+}
+
 /* Push page content and side guide down to make room for the bar.
    --ytpin-masthead-height is measured at runtime by content.js. */
 html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) ytd-page-manager#page-manager {
