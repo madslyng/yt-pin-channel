@@ -130,13 +130,6 @@
   margin-right: auto;
 }
 
-/* Invisible counterweight of half the Pin button's width, nudging the group
-   left by half a pin width so the channels sit closer to the true center. */
-#ytpin-bar.ytpin-centered::after {
-  content: "";
-  flex: 0 0 calc(var(--ytpin-item-width) / 2);
-}
-
 /* Push page content and side guide down to make room for the bar.
    --ytpin-masthead-height is measured at runtime by content.js. */
 html.ytpin-active ytd-app:not([fullscreen]):not([masthead-hidden]) ytd-page-manager#page-manager {

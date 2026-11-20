@@ -269,7 +269,7 @@
       : alreadyPinned
         ? "Channel already pinned"
         : "Pin this channel";
-    add.append(el("span", "ytpin-avatar", "+"), el("span", "ytpin-name", "Pin"));
+    add.append(el("span", "ytpin-avatar", "+"), el("span", "ytpin-name", "Add Pin"));
     add.addEventListener("click", () => pinCurrent(add));
     bar.append(add);
 
